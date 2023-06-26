@@ -5,7 +5,6 @@ const UsersControllers = require("../Controllers/UsersControllers");
 const usersRoutes = Router();
 
 function myMiddleware( request, response, next) {
-    console.log("You passed for the middleware!")
 
     next();
 }  
