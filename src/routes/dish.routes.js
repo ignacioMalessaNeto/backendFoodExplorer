@@ -9,9 +9,9 @@ const dishController = new DishController();
 
 dishRoutes.get("/", dishController.index);
 dishRoutes.post("/:adm_id", dishController.create);
+dishRoutes.put("/:id", dishController.update)
 dishRoutes.get("/:id", dishController.show);
 dishRoutes.delete("/:id", dishController.delete);
-
 
 
 module.exports = dishRoutes;

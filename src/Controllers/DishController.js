@@ -1,5 +1,7 @@
 const knex = require("../database/knex");
 
+const sqliteConnection = require("../database/sqlite");
+
 class DishController {
     async create(request, response) {
         const { name, description, ingredients, category, price } = request.body;
@@ -29,7 +31,7 @@ class DishController {
     async show(request, response) {
         const { id } = request.params;
 
-        const dish = await knex("dish").where({id}).first();
+        const dish = await knex("dish").where({ id }).first();
         const ingredients = await knex("ingredients").where({ dish_id: id }).orderBy("name");
 
         return response.json({
@@ -47,7 +49,7 @@ class DishController {
     }
 
     async index(request, response) {
-        const { adm_id, name,  ingredients } = request.query;
+        const { adm_id, name, ingredients } = request.query;
 
         let dish;
 
@@ -72,8 +74,8 @@ class DishController {
                 .orderBy("name");
         }
 
-        const userAdmIngredients = await knex("ingredients").where({ adm_id});
-        const dishWithIngredients = dish.map(dish  => {
+        const userAdmIngredients = await knex("ingredients").where({ adm_id });
+        const dishWithIngredients = dish.map(dish => {
             const noteTags = userAdmIngredients.filter(ingredient => ingredient.dish_id === dish.id)
             return {
                 ...noteTags,
@@ -85,6 +87,34 @@ class DishController {
         return response.json({ dishWithIngredients })
     }
 
+    async update(request, response) {
+        const { id } = request.params;
+
+        const { name, description, category, price } = request.body;
+
+        const database = await sqliteConnection();
+
+        const dish = await database.get("SELECT * FROM dish WHERE id = (?)", [id]);
+
+        dish.name = name;
+        dish.description = description;
+        dish.category = category;
+        dish.price = price;
+
+        await database.run(`
+            UPDATE dish SET
+            name = ?,
+            description = ?,
+            category = ?,
+            price = ?,
+            updated_at = DATETIME('now')
+            WHERE id = ?`,
+            [dish.name, dish.description, dish.category, dish.price,  id]
+          );
+      
+          return response.json();
+
+    }
 
 }
 
