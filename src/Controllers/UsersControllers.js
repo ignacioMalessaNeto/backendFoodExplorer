@@ -9,10 +9,11 @@ class UsersController {
         const { name, email, password, is_admin } = request.body;
 
         const database = await sqliteConnection();
+
         const checkUsersExist = await database.get("SELECT * FROM users WHERE email = (?)", [email])
 
         if(checkUsersExist){
-            throw new AppError("This email is already in use.")
+            throw new AppError("Este email já está em uso.")
         }
 
         const hashedPassword = await hash(password, 8)
