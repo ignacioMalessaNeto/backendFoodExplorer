@@ -32,17 +32,17 @@ class DishController {
             }
 
         })
-        
+
         await knex("ingredients").insert(ingredientsInsert);
 
-        response.json({dish_id});
+        response.json({ dish_id });
     }
 
     async show(request, response) {
         const { id } = request.params;
 
         const dish = await knex("dish").where({ id }).first();
-        const ingredients = await knex("ingredients").where({ dish_id : id }).orderBy("name");
+        const ingredients = await knex("ingredients").where({ dish_id: id }).orderBy("name");
 
         return response.json({
             ...dish,
@@ -68,41 +68,48 @@ class DishController {
         const { name, ingredients } = request.query;
         const user_id = request.user.id;
         const adm_id = user_id;
-        let dish;
+        let dishes;
+
 
         if (ingredients) {
             const filterIngredients = ingredients.split(",").map(ingredient => ingredient.trim());
 
-            dish = await knex("ingredients")
+            dishes = await knex("ingredients")
                 .select([
                     "dish.id",
                     "dish.name",
                     "dish.adm_id"
                 ])
-                .where("dish.adm_id", adm_id)
+                .where("dish.adm_id", user_id)
                 .whereLike("dish.name", `%${name}%`)
-                .whereIn("ingredients.name", filterIngredients)
+                .whereIn("name", filterIngredients)
                 .innerJoin("dish", "dish.id", "ingredients.dish_id")
+                .groupBy("dish.id")
                 .orderBy("dish.name")
-        } else {
-            dish = await knex("dish")
-                .where({ adm_id })
+        }
+        if (name) {
+            dishes = await knex("dish")
+                .where({ user_id })
                 .whereLike("name", `%${name}%`)
                 .orderBy("name");
         }
+        if (!name && !ingredients) {
+            dishes = await knex("dish").orderBy("name")
+        }
 
-        const userIngredients = await knex("ingredients").where({ adm_id });
-        const dishWithIngredients = dish.map(dish => {
-            const dishIngredients = userIngredients.filter(ingredient => ingredient.dish_id === dish.id)
+        const dishIngredients = await knex("ingredients").where({ adm_id });
+        const dishWithIngredients = dishes.map(dish => {
+            const dishIngredient = dishIngredients.filter(ingredient => ingredient.dish_id === dish.id)
             return {
-                ...dishIngredients,
-                ingredients: dishIngredients
+                ...dish,
+                ingredients: dishIngredient
             }
-
         })
 
-        return response.json({ dishWithIngredients })
+        return response.json(dishWithIngredients)
+
     }
+
 
     async update(request, response) {
         const user_id = request.user.id;

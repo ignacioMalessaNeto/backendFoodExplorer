@@ -14,13 +14,14 @@ const imageDishController = new ImageDishController;
 
 const ensureAuthenticated = require("../middleware/ensureAuthenticated");
 
+
 dishRoutes.use(ensureAuthenticated);
 
-dishRoutes.get("/", dishController.index);
-dishRoutes.get("/:id", dishController.show);
-dishRoutes.put("/:id",dishController.update)
-dishRoutes.post("/", dishController.create);
-dishRoutes.delete("/", dishController.delete);
+dishRoutes.get("/", ensureAuthenticated, dishController.index);
+dishRoutes.post("/", ensureAuthenticated,dishController.create);
+dishRoutes.delete("/",ensureAuthenticated, dishController.delete);
+dishRoutes.get("/:id", ensureAuthenticated, dishController.show);
+dishRoutes.put("/:id",ensureAuthenticated, dishController.update)
 dishRoutes.patch("/img_dish", ensureAuthenticated,upload.single("img_dish"), imageDishController.update)
 
 

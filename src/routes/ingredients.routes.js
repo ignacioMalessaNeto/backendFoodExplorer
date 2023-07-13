@@ -6,7 +6,7 @@ const ingredientsRoutes = Router();
 
 const ingredientsController = new IngredientsController();
 
-ensureAuthenticated = require("../middleware/ensureAuthenticated");
+const ensureAuthenticated = require("../middleware/ensureAuthenticated");
 
 ingredientsRoutes.get("/", ensureAuthenticated,ingredientsController.index);
 
