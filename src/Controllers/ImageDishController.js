@@ -11,8 +11,6 @@ class ImageDishController {
 
         const diskStorage = new DiskStorage();
 
-        console.log(dish_id);
-
         const dish = await knex("dish").where({id: dish_id}).first(); 
 
         if(dish.img_dish){

@@ -9,5 +9,4 @@ const ingredientsController = new IngredientsController();
 const ensureAuthenticated = require("../middleware/ensureAuthenticated");
 
 ingredientsRoutes.get("/", ensureAuthenticated,ingredientsController.index);
-
 module.exports = ingredientsRoutes;

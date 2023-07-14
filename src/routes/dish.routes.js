@@ -19,7 +19,7 @@ dishRoutes.use(ensureAuthenticated);
 
 dishRoutes.get("/", ensureAuthenticated, dishController.index);
 dishRoutes.post("/", ensureAuthenticated,dishController.create);
-dishRoutes.delete("/",ensureAuthenticated, dishController.delete);
+dishRoutes.delete("/:id",ensureAuthenticated, dishController.delete);
 dishRoutes.get("/:id", ensureAuthenticated, dishController.show);
 dishRoutes.put("/:id",ensureAuthenticated, dishController.update)
 dishRoutes.patch("/img_dish", ensureAuthenticated,upload.single("img_dish"), imageDishController.update)
