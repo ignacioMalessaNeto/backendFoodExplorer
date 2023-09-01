@@ -17,10 +17,10 @@ const ensureAuthenticated = require("../middleware/ensureAuthenticated");
 
 dishRoutes.use(ensureAuthenticated);
 
-dishRoutes.get("/", ensureAuthenticated, dishController.index);
 dishRoutes.post("/", ensureAuthenticated,dishController.create);
-dishRoutes.delete("/:id",ensureAuthenticated, dishController.delete);
+dishRoutes.get("/", ensureAuthenticated, dishController.index);
 dishRoutes.get("/:id", ensureAuthenticated, dishController.show);
+dishRoutes.delete("/:id",ensureAuthenticated, dishController.delete);
 dishRoutes.put("/:id",ensureAuthenticated, dishController.update)
 dishRoutes.patch("/img_dish", ensureAuthenticated,upload.single("img_dish"), imageDishController.update)
 
