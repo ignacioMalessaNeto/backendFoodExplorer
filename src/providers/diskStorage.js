@@ -1,4 +1,6 @@
+// biome-ignore lint/style/useNodejsImportProtocol: <explanation>
 const fs = require("fs");
+// biome-ignore lint/style/useNodejsImportProtocol: <explanation>
 const path = require("path");
 const uploadConfig = require("../configs/upload")
 

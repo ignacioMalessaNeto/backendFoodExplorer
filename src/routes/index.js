@@ -4,6 +4,8 @@ const usersRoutes = require("./user.routes");
 const dishRoutes = require("./dish.routes");
 const ingredientsRoutes = require("./ingredients.routes");
 const sessionsRouter = require("./sessions.routes");
+const orders = require("./orders.routes");
+
 
 const routes = Router();
 
