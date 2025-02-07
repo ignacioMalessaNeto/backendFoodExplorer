@@ -5,51 +5,53 @@ class OrdersDishesController {
   // Adiciona um prato a um pedido
   async create(request, response) {
     try {
-      const { order_id, dish_id, quantity } = request.body;
-
+      const { order_id, dishes } = request.body; // Agora recebe um array de pratos
+  
       // Verifica se o pedido existe
-      const order = await knex("orders").where("id", order_id).first();
+      const order = await knex("orders").where("id", order_id);
       if (!order) {
         throw new AppError("Pedido não encontrado.", 404);
       }
-
-      // Verifica se o prato existe e obtém o preço
-      const dish = await knex("dish").where("id", dish_id).first();
-      if (!dish) {
-        throw new AppError("Prato não encontrado.", 404);
+  
+      // Itera sobre o array de pratos
+      for (const dish of dishes) {
+        const { dish_id, quantity } = dish;
+  
+        // Verifica se o prato existe e obtém o preço
+        const dishData = await knex("dish").where("id", dish_id).first();
+        if (!dishData) {
+          throw new AppError(`Prato com ID ${dish_id} não encontrado.`, 404);
+        }
+  
+        const { price } = dishData;
+  
+        // Insere o prato no pedido
+        await knex("order_dishes").insert({
+          order_id,
+          dish_id,
+          quantity,
+          price,
+        });
       }
-
-      const { price } = dish;
-
-      // Insere o prato no pedido
-      await knex("order_dishes").insert({ order_id, dish_id, quantity, price });
-
+  
       // Atualiza o order_total do pedido
-      try {
-        // Obtém todos os pratos associados ao pedido
-        const orderDishes = await knex("order_dishes").where({ order_id });
-
-        // Calcula o total do pedido
-        const order_total = orderDishes.reduce((total, item) => {
-          return total + item.price * item.quantity;
-        }, 0);
-
-        // Atualiza o order_total na tabela orders
-        await knex("orders").where("id", order_id).update({ order_total });
-      } catch (error) {
-        throw new AppError(
-          `Erro ao atualizar o total do pedido: ${error.message}`,
-          500
-        );
-      }
-
+      const orderDishes = await knex("order_dishes").where({ order_id });
+  
+      // Calcula o total do pedido
+      const order_total = orderDishes.reduce((total, item) => {
+        return total + item.price * item.quantity;
+      }, 0);
+  
+      // Atualiza o order_total na tabela orders
+      await knex("orders").where("id", order_id).update({ order_total });
+  
       // Retorna os pratos associados ao pedido
       const order_dishes = await knex("order_dishes").where({ order_id });
-
+  
       return response.json({ order_dishes });
     } catch (error) {
       throw new AppError(
-        `Erro ao adicionar prato ao pedido: ${error.message}`,
+        `Erro ao adicionar pratos ao pedido: ${error.message}`,
         500
       );
     }
